@@ -9,7 +9,7 @@ Chilton, Lydia B., et al. "Task search in a human computation market." Proceedin
 
 ## Links
 1. [PDF](http://john-joseph-horton.com/papers/task_search_in_a_human_computation_market.pdf)
-1. [Presentation (Google Docs)](https://docs.google.com/presentation/d/1HtcUj6f6weYk6fu6ATzWume9Iz-DJb1bwGJdSJbnxyM/edit#slide=id.gefa2d98b_2_143).
+1. [Presentation (Google Docs)](https://docs.google.com/presentation/d/1HtcUj6f6weYk6fu6ATzWume9Iz-DJb1bwGJdSJbnxyM/edit#slide=id.gefa2d98b_2_42).
 1. [Published version in HCOMP 2010 Proceedings](http://scholar.google.com/citations?view_op=view_citation&hl=en&user=L_O2kH0AAAAJ&citation_for_view=L_O2kH0AAAAJ:d1gkVwhDpl0C)
 1. [Google Scholar Citation History](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=L_O2kH0AAAAJ&citation_for_view=L_O2kH0AAAAJ:d1gkVwhDpl0C)
 
