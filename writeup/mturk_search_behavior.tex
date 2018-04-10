@@ -1,0 +1,1275 @@
+%\documentclass{acm_proc_article-sp}
+%\documentclass[10pt, twocolumn][{article}
+\documentclass{sig-alternate}
+\usepackage{ifthen,subfig,verbatim} 
+\begin{document}
+
+\title{Task Search in a Human Computation Market} 
+
+\numberofauthors{4}
+
+\author{
+\alignauthor 
+Lydia B. Chilton\\
+       \affaddr{University of Washington}\\
+      % \affaddr{AC101 Paul G. Allen Center, Box 352350}\\
+      % \affaddr{185 Stevens Way}\\
+      % \affaddr{Seattle, WA 98195-2350}\\
+       \affaddr{hmslydia@cs.washington.edu}
+\alignauthor 
+John J. Horton\\
+       \affaddr{Harvard University}\\
+      % \affaddr{383 Pforzheimer Mail Center}\\
+      % \affaddr{56 Linnaean Street}\\
+      % \affaddr{Cambridge, MA 02138}\\
+       \affaddr{horton@fas.havard.edu}
+\and
+\alignauthor
+Robert C. Miller\\
+       \affaddr{MIT CSAIL}\\
+      % \affaddr{383 Pforzheimer Mail Center}\\
+      % \affaddr{56 Linnaean Street}\\
+      % \affaddr{Cambridge, MA 02138}\\
+       \affaddr{rcm@mit.edu}
+% 2nd. autho
+\alignauthor
+Shiri Azenkot\\
+       \affaddr{University of Washington}\\
+      % \affaddr{383 Pforzheimer Mail Center}\\
+      % \affaddr{56 Linnaean Street}\\
+      % \affaddr{Cambridge, MA 02138}\\
+       \affaddr{shiri@cs.washington.edu}
+% 2nd. author
+}
+%
+%\conferenceinfo{KDD-HCOMP'10,} {July 25th, 2010, Washington,DC, USA.} 
+%\CopyrightYear{2010}
+%\crdata{978-1-4503-0222-7}
+%\clubpenalty=10000
+%\widowpenalty = 10000
+
+\maketitle
+
+\begin{abstract} 
+
+In order to understand how a labor market for human computation
+functions, it is important to know how workers search for tasks. This
+paper uses two complementary methods to gain insight into how workers
+search for tasks on Mechanical Turk.  First, we perform a high
+frequency scrape of 36 pages of search results and analyze it by
+looking at the rate of disappearance of tasks across key ways
+Mechanical Turk allows workers to sort tasks. Second, we present the
+results of a survey in which we paid workers for self-reported
+information about how they search for tasks.  Our main findings are
+that on a large scale, workers sort by which tasks are most recently
+posted and which have the largest number of tasks available.  Furthermore,
+we find
+that workers look mostly at the first page of the most recently posted
+tasks and the first two pages of the tasks with the most available
+instances but in both categories the position on the result page is
+unimportant to workers.  We observe that
+at least some employers try to manipulate the position of their task in the search results to
+exploit the tendency to search for recently posted tasks.  On an individual level, we observed
+workers searching by almost all the possible categories and looking
+more than 10 pages deep. 
+For a task we posted to Mechanical Turk, we confirmed that a favorable position in the search 
+results do matter: our task with favorable positioning was completed 30 times faster and for less money than when its position was unfavorable.  
+
+\end{abstract}
+
+% A category with the (minimum) three required fields
+\category{H.3.3}{Information Storage and Retrieval}{Information Search and Retrieval}
+\category{J.4}{Social and Behavioral Sciences}{Economics}
+
+\terms{Economics, Experimentation, Human Factors, Measurement}
+\keywords{Search, Amazon Mechanical Turk, Human Computation, Crowdsourcing, Experimentation}
+
+
+\section{Introduction}
+In every labor market, information plays a critical role in
+determining efficiency: buyers and sellers cannot make good choices
+unless they know their options. According to a rational economic model
+of labor supply, workers use information about the availability and
+the nature of tasks to make decisions about which tasks to accept.  If
+workers lack full information about the tasks, they are likely to make
+sub-optimal decisions, such as accepting inferior offers or exiting
+the market when they would have stayed, had they known about some
+other task. In large markets with many buyers and sellers, lack of
+knowledge about all available options is a key source of
+friction. This lack of knowledge stems from the fact that searching is
+neither perfect nor costless.
+
+The ``search problem'' is particularly challenging in labor markets
+because both jobs and workers are unique, which means that there is no
+single prevailing price for a unit of labor, nevermind a commodified
+unit of labor. In many labor markets, organizations and structures
+exist to help improve the quality and quantity of information and
+reduce these ``search frictions.'' We have already seen conventional
+labor markets augmented with informational technology, such as job
+listing web sites like Monster.com \cite{autor2001wiring}, and yet a
+great deal of of information is privately held or distributed through
+social networks and word of mouth.
+
+In online labor markets, there is relatively little informal sharing
+of information as in traditional markets. Given that online labor
+markets face no inherent geographic constraints, these markets can be
+very large, further exacerbating search frictions. These frictions can
+and are eased by making the data searchable through a variety of
+search features.  If agents can sort and filter tasks based on
+characteristics that determine the desirability of a task, they are
+able to make better choices, thereby improving market efficiency.  Of
+course, this hypothetical gain in efficiency depends upon the search
+technology provided and the responses of buyers to that technology.
+
+Amazon's Mechanical Turk (MTurk) is an online labor market for human
+computation.  It offers several search features that allow workers to
+find Human Intelligence Tasks (HITs).  HITs can be sorted by fields
+such as most available, highest reward, and title.  HITs are also
+searchable by keyword, minimum reward, whether they require
+qualifications (and combinations thereof).  In this paper, we seek to
+provide insight into how workers search for tasks.
+
+We present the results of two methods for investigating search
+behavior on MTurk.  First, we scrape pages of available HITs at a very
+high rate and determine the rate at which a type of HIT is being taken
+by workers.  We use a statistical model to compare the rate of HIT
+disappearance across key categories of HITs that MTurk allows workers
+to search by.  Our premise for observing search behavior is that
+search methods which return HITs with higher rates of disappearance
+are the search methods which workers use more.  This method relies
+only on publicly available data---the list of HITs available on
+www.mturk.com.  Second, we issued a survey on MTurk asking over 200
+workers how they searched for tasks.  We posted the survey with
+carefully chosen parameters so as to position it so that it can be
+found more easily by some search methods and not others. This way, we
+can target search behaviors that are not picked up by the analysis of
+the scraped data.
+
+In this paper, we first motivate studying search behavior in an online
+human computation labor market by reviewing related work.  We next
+describe MTurk's search features and our method of data collection
+based on these search features.  We then present a statistical
+analysis of our high-frequency scraped data followed by the results of a survey of MTurk workers.
+
+\section{Related Work} 
+In the field of human computation, it is important to ask ``Why are
+people contributing to this effort?"  What are the motivations behind
+labeling an image \cite{von2004labeling}, uploading videos to YouTube \cite{huberman-crowdsourcing}, or identifying the genre of a song
+\cite{law2003tagatune}?  On MTurk, the main motivation seems to be
+money \cite{ipeirotis2010,hortonZeck2010}.  However, financial
+motivations do not imply that workers are only motivated to find HITs offering the highest rewards: workers may choose from among thousands of HITs that differ in required qualifications, level of difficulty, amount of reward, and
+amount of risk. With all of these factors at play, workers face significant
+decision problems.  Our task was to model this decision problem.
+
+Because MTurk is a labor market, labor economics---which models
+workers as rational agents trying to maximize net benefits over
+time---may provide a suitable framework.  Research on the labor economics
+of MTurk has shown that workers do respond positively to prices but
+that price is not indicative of work quality \cite{mason2009fip}.  Previous work \cite{horton2010labor} shows
+that not all workers follow a traditional rational model of labor
+supply when choosing their level of output.  Instead of maximizing
+their wage rate, many workers create target earnings---they focus on
+achieving a target such as \$.25 or \$1.00 and ignore the wage rate.  Although price is important to task choice, it is clearly not the only
+factor; research on
+search behavior is necessary in order to more fully understand how workers interact with the labor market.
+
+In other domains where users must cope with a large information space,
+progress and innovation in search have had enormous positive impacts.
+Developments such as Page\-Rank \cite{brin1998pagerank} have made it possible to search the long tail of large, linked document collections by keyword.  Innovations such as faceted browsing \cite{hearst2002finding} and collaborative filtering \cite{goldbergInformationTapestry} have made it faster and easier to search within more structured domains such as shopping catalogues.   Web queries are sensitive to changes in content over time,
+and searchers have an increasing supply of tools to help them find updates on webpages they revisit \cite{adar2008zoetrope}.  In labor and human computation markets, search tools are still evolving and it remains to be determined what features will prove most useful in overcoming search frictions.
+
+Web search analysis has shown that the  first result on the first page of search results has by far the highest click-through rate \cite{spink2000selected}.  In a market model where parties have full
+information, there would be no need for search technologies---no purely ``positional effects''---all parties would instantly and
+costlessly find their best options.  In reality, search technologies
+are likely to have strong effects on the buyer-seller matches that are
+made.  This point is evident by the fact that companies are willing to
+spend billions of dollars to have advertisements placed in prime
+areas of the screen \cite{edelman2007internet}.
+
+While there are similarities between many kinds of online search
+activities, we must be careful in generalizing.  Search behavior in one
+domain does not necessarily carry over to other domains.  In this paper
+we focus solely on the domain of workers searching for HITs on MTurk,
+using web search behavior as a guide to what features may be
+important. 
+
+\section{MTurk Search Features} \label{sec:features}
+At any given time, MTurk will have on the order of $100,000$ HITs
+available.  HITs are arranged in HIT groups.  All HITs posted by the same person with the same featues ( title, reward, description, etc) are listed together in a HIT group to avoid repetition in the list of available HITs.  HIT groups are presented much like traditional web search engine
+results, with 10 HIT groups listed on each page of search results.  By default, the list is sorted by ``HITs Available (most
+first).''  The default view gives seven pieces of information:
+\begin{enumerate}
+\item Title (e.g., ``Choose the best category for this product")
+\item Requester (e.g., ``Dolores Labs")
+\item HIT Expiration Date (e.g., ``Jan 23, 2011 (38 weeks)")
+\item Time Allotted (e.g., ``60 minutes")
+\item Reward (e.g., ``\$0.02")
+\item HITs Available (e.g., 17110)
+\item Required qualifications (if any)
+\end{enumerate}
+By clicking on a HIT title, the display expands to show three
+additional fields:
+\begin{enumerate}
+\item Description (e.g., ``Assign a product category to this product'')
+\item Keywords (e.g., categorize, product, kids)
+\item Qualifications. (e.g., ``Location is US'')
+\end{enumerate}
+The MTurk interface also offers several search features prominently
+positioned at the top of the results page, including a keyword
+search and a minimum reward search.  Additionally, HITs can be sorted in either ascending or descending order by six categories:
+
+\begin{enumerate}
+\item HIT Creation Date ({\bfseries {\em newest}} or {\bfseries {\em oldest}})
+\item HITs Available ({\bfseries {\em most}} or {\bfseries {\em fewest}}) (i.e., how many sub-tasks may be performed)
+\item Reward Amount ({\bfseries {\em highest}} or {\bfseries {\em lowest}})
+\item Expiration Date ({\bfseries {\em soonest}} or {\bfseries {\em latest}})
+\item Title ({\bfseries {\em a-z}} or {\bfseries {\em z-a}})
+\item Time Allotted ({\bfseries {\em shortest}} or {\bfseries {\em longest}})
+\end{enumerate}
+
+Some sort results change more quickly than others.  Sorting by most
+recent creation date will produce a very dynamic set of HIT groups.
+However, sorting by most HITs Available will produce a fairly
+static list because it takes a long time for a HIT group that contains, say, $17,000$ HITs to fall off the list.
+
+On each worker's account summary page, MTurk suggests 10 particular HITs, usually
+with high rewards but no other apparent common characteristic.  Other
+than this, we are unaware of any services to intelligently recommend
+HITs to workers.  We presume that nearly all searching is done using
+the MTurk search interface.   A Firefox extension called Turkopticon \cite{silberman2010sellers} helps workers avoid tasks posted by requesters that were reported by other users as being unfair in their view.  This could affect workers' choices of which tasks to accept, but probably has little effect on the category workers choose to sort by and does not reorder or remove HITs from the results pages.  
+
+Requesters post tasks on MTurk and pay workers
+for acceptable work.  There are two basic types of HITs that encompass most postings: ($1$) tasks such
+as image labeling, where workers are invited to perform as many various tasks as are available to be completed, and ($2$) tasks such as surveys, which require many workers but allow each worker to do the HIT only once.  Type ($2$) HIT groups appear to workers as single HIT because there is only one HIT available to each worker.  If a worker does not accept the HIT, it will remain on his list
+of available HITs until the total number of performances desired by the requester are completed.  It often takes a substantial amount of time to achieve the throughput of workers necessary to
+complete type ($2$) HITs where the task only appears as a single available HIT to each worker.  Because it is a small wonder they those HITs get done at all, we call them ``$1$-HIT Wonders.''
+
+For HIT groups that allow individual workers to perform a single task multiple times (type ($1$)), the number of ``HITs Available'' is constantly updated.  The number can increase in only two cases: first, when a HIT is returned by a worker unperformed and, second, in the rare event that more tasks are added to the HIT group before it is finished.  Fortunately, this second case is easy to detect.
+
+In this paper, we use HIT disappearance rates to perform a
+statistical analysis of search behavior for type ($1$) HIT groups containing multiple tasks available to all workers.  We complement our analysis with the results of a survey where workers were asked about how they search for tasks such as $1$-HIT Wonders that the scraping does not address.
+
+\section{Method A: Inferences from Observed Data}
+We want to determine whether the sort category, the page on which a
+HIT appears (page placement), and the position it occupies on that
+page (page position) affect the disappearance rate of a HIT.  Our
+premise is that if any of these factors affect the disappearance rate
+of a HIT, then workers are using that search feature to find HITs.
+This approach makes use of what economists call a ``natural
+experiment''.  
+
+To understand it, consider the following thought experiment:
+Imagine that we could randomly move HITs to different pages and page
+positions within the various search categories without changing the
+attributes of the HITs.  With this ability, we could determine the
+causal effects of HIT page placement and page position by observing
+how quickly a HIT is completed. Of course, we do not actually possess
+the ability to manipulate search results in this way for HITs we do
+not post, but we are able to observe the functioning of the market and
+potentially make a similar inference based on the scraped
+data.\footnote{In Method B, we will actually manipulate our HITs
+  position in the search results (albeit by modifying the HIT
+  attributes).}
+
+The problem with this approach, however, is that HIT characteristics
+that are likely to affect the popularity of a HIT should also affect
+its page placement and page position within the search results of the
+various sorting categories.  In fact, the relationship between
+attributes and search results page placement and page position is the
+whole reason MTurk offers search features---if search results page
+placement and page position were unrelated to HIT characteristics that
+workers cared about, then any search category based on those
+characteristics would offer no value.
+
+To deal with the problem of correlation between attributes and page
+placement and page position, we needed to make several assumptions and
+tailor our empirical approach to the nature of the domain.  Before
+discussing our actual model, it will be helpful to introduce a
+conceptual model.  We assume that the disappearance of a particular
+HIT during some interval of time is an unknown function of that HIT's
+attributes and its page placement and page position (together, its
+position in the list of search results):
+\[
+\mbox{Disappearance of HIT $i$} = F(\mbox{position of $i$},X_i)
+\]
+where $X_i$ are all the HIT attributes, market level variables, and
+time-of-day effects that might also affect disappearance rate.  Our key
+research goal was to observe how manipulations of the position of
+$i$---while keeping $X_i$ constant---affect our outcome measure,
+the disappearance of HITs (i.e., work getting done).  We were
+tempted to think that we could include a sufficient number of HIT
+co-variates (e.g., reward, keywords, etc.) and control for the effects of
+$X_i$, but this is problematic because we cannot control for all factors. 
+
+Our goal of untangling causality was complicated by the fact that we
+cannot exogenously manipulate search results and the fact that there
+are HIT attributes for which we cannot control.  Our approach was to
+acknowledge the existence of unobserved, HIT-specific idiosyncratic
+effects but to assume that those effects are constant over time for a
+particular HIT group. With this assumption, we relied upon movement in
+HIT position within a sort category as a ``natural experiment.''  When
+we observed a HIT moving from one position to another, and then
+observed that the HIT disappeared more quickly in the new position, we
+attributed the difference in apparent popularity to the new position,
+and not to some underlying change in the nature of the HIT.
+
+\subsection{Data Collection}
+There are 12 ways in which MTurk allows workers to sort HITs---six
+categories, each of which can be sorted in ascending or descending order.
+We scraped the first three pages of search results for each of the 12
+sorting methods.  Each page of results lists 10 hits, which meant that
+we scraped $360$ HITs in each iteration.  We scraped each of the $36$
+pages approximately every $30$ seconds---just under the throttling
+rate. Although we ran the scraper for four days, due to our own data
+processing constraints, in this analysis we used data collected in a
+$32$-hour window beginning on Thursday, April $29$, $2010$, 20:37:05
+GMT and ending on Saturday, May $1$, $2010$, 04:45:45 GMT.  The data
+contains $997,322$ observations. Because of the high frequency of our
+scraping, each posted HIT is observed many times in the data: although
+the data contains nearly $1,000,000$ observations, we only observed
+$2,040$ unique HITs, with each HIT observed, on average, a little more
+than $480$ times.
+
+For each HIT, we recorded the 10 pieces of information that the MTurk
+interface offers (seven default and three additional features---see
+Section \ref{sec:features}), as well as the sort category used to find
+the HIT, the page placement of the HIT ($1$, $2$ or $3$), and the page
+position of the HIT (first through tenth).
+
+\subsubsection{Measuring HIT disappearance}
+Formally, let $s$ index the sort category, let $g$ index the groups of
+observations of the same HIT (which occur because each HIT is observed
+many times), and let $i$ index time-ordered observations within a HIT
+group.  Let HITs be ordered from oldest to most recently scraped, such
+that $i+1$ was scraped after $i$.  Let the number of HITs available
+for observation $i$ be $y_{igs}$.  The change is simply $\Delta
+y_{igs} = y_{(i+1)gs} - y_{igs}$.
+
+Unfortunately, there are several challenges in treating this outcome
+measure as a direct measure of uptake.  First, requesters can add and
+delete tasks in a HIT group over time.  If a requester deletes a large
+number of tasks, then a regression might incorrectly lead us to
+believe that there was something very attractive to workers about the
+page placement and/or page position of the HIT.  Second, for 1-HIT
+Wonders, the HITs-available measure might not change even though the
+HIT is very popular.  Finally, the absolute change is ``censored'' in
+that the number of HITs available cannot go below zero, which means
+that HIT groups with many tasks available are able to show greater
+changes than HIT groups with few tasks available.  For these reasons,
+we make our outcome variable an indicator for a drop in HITs
+available, regardless of the magnitude of the change:
+\[Y_{igs} = 1\cdot \{\Delta y_{ijs} < 0\} \]
+
+\subsection{Econometric set-up}
+To implement our conceptual model, we assumed a linear regression
+model in which the expected outcome is a linear function of a series
+of variables.  Obviously, many factors determine whether or not a HIT
+disappears from search results.  Page placement, page position, and
+sort category certainly matter, but so do variables that are hard to
+observe and which we cannot easily include in a regression.  For
+example, a comparatively high-paying, short task that looks fun will
+probably be accepted more quickly than one that is low-paying, long,
+and tedious.  In creating our model, we sought to separate the
+desirability of a task from the page placement and page position it
+occupies in the search results of a particular sorting category.
+
+\subsubsection{Choosing a model}
+Rather than simply introduce a number of controls that will invariably
+miss factors that are unmeasured, we included a HIT group-specific
+control in the regressions called a ``group random effect.''  Each HIT
+group was modeled as having its own individual level of attractiveness
+that stays constant over time.  In this way, all factors that have a
+static effect on HIT attractiveness were controlled for, regardless of
+whether or not we are able to observe the factors that determine a HIT
+groups attractiveness.
+
+With a group-specific random effect, we eliminate one of they key
+problems that would arise from simply using a pooled model.  For
+example, a fun HIT that always stays on the third page of results
+sorted by highest reward might cause us to erroneously believe that
+the third page is very important, when the case is simply that one HIT
+group is disappearing quickly.  
+
+%This issue also arose when we compared
+%the group specific random effects model to the ``pooled'' model that
+%lacks any group effects.
+One necessary word on the nomenclature of these two models: when
+dealing with data that has a natural group structure, a model with a
+group specific-effect is called a ``random effects'' model or
+``multilevel'' model; a model that ignores the group structure and
+does not include any group-specific effects is called a ``pooled''
+model.  Both types are linear regression models.  While our
+group-specific effect model ``controls'' for group factors, we do not
+actually include a dummy variable for each group (which is called the
+``fixed effects'' model).  Rather, we start with a prior assumption
+that each effect is a random draw from a normal distribution (the
+random effects model) \cite{gelman2007data}.  As the number of
+observations increases, this fixed effects/random effects distinction
+becomes less important.
+
+\subsubsection{Model}
+The group-specific random effects model is as follows: for an
+observation $i$ of group $g$, we estimate 
+\begin{align} \label{eq:groups}
+Y_{igs} = \sum_{r=1}^{30}\beta^r_s x^r_{igs} + \gamma_g + \tau_{H(i,g)} + \epsilon
+\end{align} 
+where $x^r_{ig}=1$ if the HIT $i$ is at position $r$ (and
+$x^r_{ig}=0$ otherwise) and where $\gamma_g \sim
+N(0,\sigma_\gamma^2)$ is the group-specific random effect and
+$\tau_{H(i)} \sim N(0,\sigma^2_\tau)$ is a time-of-day random
+effect.  The pooled model ignores this grouped structure and
+imposes the constraint that there is no group effect and $\gamma_g =
+\gamma = 0$.
+
+\subsection{Results}
+\begin{figure*}
+  \centering 
+   \subfloat[][Group-specific random effects model]{\includegraphics[scale=.5]{"./images/FIGA_coef_re"}}
+  \subfloat[][Pooled model]{
+    \includegraphics[scale=.5]{"./images/FIGB_coef_pooled"}}
+  \caption{Effects of position in sort category on HIT
+    disappearance.  Pages are illustrated with
+    color. Horizonal lines represent one standard error on either side. \label{fig:combined}}
+\end{figure*} 
+
+We applied our models to four of MTurk's 12 sorting options: {\em newest} HITs, {\em most available}
+HITs, {\em highest reward}, and {\em title a-z}.  The others---including {\em
+  shortest} time allotted and {\em latest expiration}---tend to produce 1-HIT Wonders and don't seem like natural ways to sort HITs.
+
+In Figure \ref{fig:combined}, the collection of coefficients,
+$\beta^r_s$, from Equation \ref{eq:groups} are plotted for both the
+group-specific random effects model (panel (a)) and the pooled model
+(panel (b)), with error bands two standard errors wide.  The four sorting
+options are listed at the top of the figure: {\em newest}, {\em most},
+{\em highest reward}, {\em a-z}.  The points are the coefficients
+(with standard error bars) for each page and position on that page,
+ranging from one to 30 (positions are displayed as negative numbers to
+preserve the spatial ordering).  The coefficients $\hat{\beta}^r_s$
+are interpretable as the probability that a HIT occupying position $r$
+decremented by one or more HITs during the scraping interval.  Our
+premise was that sort categories, page placements, and page positions with higher probability of the HIT decrement are those that workers search by.
+
+\subsection{Group random effects model} 
+Under the assumptions of the group-specific random effects model, we
+interpret the position coefficients as the probability that a HIT
+occupying a particular page position will have a disappearance event
+during the scraping interval. The only sort category that shows strong
+positional effects is {\em most}, with similar rates for the first and
+second results pages, and then a strong drop-off on the third page.
+
+From this, we conclude that workers actively sort by the {\em most}
+available HITs and look at results on the first two pages of search
+results.  On the third page of {\em most} available HITs, the average
+coefficient is high, but position effects seem to matter.  We
+conjecture this to mean that the further down the third page the HIT
+is located, the more likely workers are to abandon this search
+strategy.  However, more investigation is needed in order to confirm
+this interpretation.
+
+The page placements and page positions generated by the {\em highest
+  reward} sorting category have no apparent effect on search behavior.
+The overall levels of disappearance for HITs among the search results
+are low, which is to be expected given the relative unpopularity of
+high-reward HITs.  Also unsurprisingly, the page placements and page
+positions generated by the {\em title a-z} sorting category have no
+apparent effect on search behavior.
+
+\subsection{Pooled model}
+The group-specific random effects results shown in panel (a) of Figure
+\ref{fig:combined} are more credible than those of the pooled model in
+panel (b).  Nevertheless, panel (b) coefficients are far more precise.
+This is because panel (a) coefficients are determined solely by
+within-group movements in search result position.  For sorting
+categories that do not show much movement---such as {\em title}---the
+panel (a) estimates are comparatively imprecise.  However, the panel
+(b) estimates only capture the innate attractiveness of whatever HIT
+was occupying a particular position.  For example, at $r=20$ in panel
+(b), {\em title}, we see a strong statistically significant effect,
+but this is presumably only a feature of whatever HIT was occupying
+that position.
+
+This ``stationary HIT'' bias issue also arises in panel (b), {\em
+  reward}: on the first page of search results for {\em highest},
+there is almost zero probability of the HIT disappearing. It may seem surprising that high-reward tasks aren't being taken, but this fact can be readily explained.  Most MTurk HITs have a reward between \$$0.02$ and
+\$$1.00$.  However, there are some HITs that get posted for larger
+sums, on the order of \$$10.00$.  There are very few such HITs and
+they tend to be unpopular, so they stay on the {\em highest reward}
+page for a long time without disappearing.  We do see that on the
+second and third results pages, the probability of non-zero
+disappearance rate goes up.
+
+\subsubsection{Searching by newest HITs?}
+According to panel (a), the search results position within {\em newest} HITs is
+generally either irrelevant, or, in the case of position $1$, page $1$, is
+actually very harmful!  This {\em is} surprising.  Sorting by the {\em
+  newest} HITs seems to be a very good way to find fresh and
+interesting tasks. Further, as our survey results (described below) show,
+most workers report searching for HITs based {\em newest}.
+
+Interestingly, {\em newest} is a sort category where we would expect
+the inclusion of group effects to be irrelevant, since position in the
+{\em newest} sort category should be essentially mechanical---a HIT
+group is posted, starts off at the first position, and then moves down
+the list as newer HIT groups are posted.  Yet, in comparing {\em
+  newest} across the two panels, the effects of position are radically
+different: in panel (b), we see that position has a strong effect on
+uptake, with the predicted pattern, while in panel (a), there appears
+to be little of no effect. To summarize, the pooled model suggests
+strong effects, while the random effects model suggests no effects.
+
+\subsubsection{Discrepancy}
+We hypothesized that there were no positional effects in the group-specific
+random effects model because certain requesters actively game the
+system by automatically re-posting their HIT groups in order to keep them near
+the top of {\em newest}.  This hypothesis reconciles two
+surprising findings.
+
+First, gaming explains the absence of {\em newest}
+effects in panel (a): the benefits to being in a certain position are
+captured as part of the group effect.  To see why, consider a requester
+that can always keep his HIT at position $1$.  No matter how valuable
+position $1$ is in attracting workers, all of this effect will be
+(wrongly) attributed to that particular HIT's group-specific effect.
+
+Second, gaming explains why position $1$ appears to offer far worse
+performance in panel (a) (and why there is a generally increasing trend
+in coefficient size until position $4$).  A very large share of the HITs
+observed at position $1$ in the data came from gaming
+requesters.  A still large but relatively smaller share of the HITs observed at
+position $2$ came from gaming requesters who were trying to get their HIT groups back into position $1$, and so on.  Because
+all the purely positional benefits get loaded onto the group effects
+of gaming requestors, positions more likely to be occupied by gaming
+requestors will appear to offer smaller positional benefits. 
+
+Gaming not only reconciles the data---it is also directly
+observable.  We identified the HITs that had $75$ or more observations
+in position $1$ of {\em newest}. In Figure \ref{fig:C}, the position
+($1-30$) is plotted over time with the HIT group ID and title posted
+above.  It was immediately clear that some HITs are updated
+automatically so that they occupy a position near the top of the search results: until day $0.5$, the HIT groups in the second
+and third positions were ``competing'' for the top
+spot; around day $0.9$, they faced competition from a third HIT group
+(first panel) that managed to push them down the list.
+
+Under these gaming circumstances, the group-specific random effects
+model is inappropriate, as the positions are not randomly
+assigned.  For this reason, the pooled model probably offers a
+clearer picture of the positional effects, though the coefficient
+estimates are certainly biased because they incorporate the nature of
+HITs occupying position one, which we know is from gaming.
+
+We conclude that the pooled regression results are the correct analysis for the {\em newest} HITs category.  
+The pooled regression results show that workers are actively searching by {\em newest} HITs and focus on the first page of results.
+
+\begin{figure}
+\centering
+\includegraphics[scale=.35]{"./images/FIGC"}
+\caption{Position of three HITs over time sorted by {\em newest}. (Time measured in days)}\label{fig:C}
+\end{figure}
+
+\section{Method B: Worker Survey}
+Another way to study how workers search for HITs is to ask the workers
+directly, by conducting a survey on MTurk. Although this approach is more
+expensive, more obtrusive, and smaller-scale than scraping the MTurk
+web site, it has two advantages.  First, surveying complements the
+scraping technique.  Scraping is better suited to tracking postings of
+large numbers of type (1) HITs whose tasks can be performed multiple times by any worker,
+so an anonymous scraper can observe their acceptance.  Surveys, by
+contrast, are necessarily 1-HIT Wonders, offered at most once to every
+worker, and MTurk offers no way for a scraper to observe how many
+workers have accepted the offer.  Since a substantial use of MTurk
+involves 1-HIT Wonders for online experimentation and surveys of other
+kinds, we need a method for exploring search behavior on this side of
+the market.  Second, surveys can provide more detailed and subjective
+explanations for worker behavior than aggregate statistics.
+
+This section presents the results of a survey of roughly 250 workers
+about how they sort and filter HITs. Since MTurk was used to
+conduct the survey, the characteristics of the HIT used to solicit
+survey respondents have an effect on the results.  We explored this
+effect by posting the survey in several different ways in order to
+sample workers who exhibited different search behaviors.  In the process,
+we observed how certain choices of HIT characteristics can make a HIT
+very hard to find, substantially reducing the response rate.  Finally,
+the survey also collected free-form comments from workers about how
+they find good and bad HITs.
+
+\subsection{Procedure}
+The survey was designed to probe respondents' immediate search
+behavior---specifically, how respondents used MTurk's search interface
+to discover the survey HIT itself.  The survey asked several
+questions: (1) which of the 12 sort categories they were presently
+using; (2) whether they were filtering by a keyword search or minimum
+price; and (3) what page number of the search results they found the
+survey HIT on.  A final question asked the worker for free-form
+comments about how easy or hard it is to find HITs.
+
+The survey was posted on MTurk in four ways, using different HIT
+characteristics for each posting to give it high and low positions in
+the various sorted search results.  Aside from these manipulated
+parameters, the four postings were identical (e.g. in title,
+description, preview, and actual task).
+
+{\bf Best-case posting.} In one posting, the parameters of the HIT were chosen to place it among the top search results under each of the six primary sort categories.  Thus
+the HIT would appear on the first page, or as close as possible, when
+HITs were sorted by {\em any} attribute, though only in one
+direction (ascending or descending).  The goal of this posting was to capture as many
+workers as possible from each of the six chosen sort orders that the
+posting optimized.
+
+The HIT was automatically one of the {\em newest}, at least at first,
+and had the {\em fewest} possible HITs available because it was only
+offered once to each worker.  For reward, we chose the {\em least}
+amount: \$0.01.  For the {\em soonest} expiration date and the {\em
+  shortest} time allotted, we chose 5 hours and 5 minutes,
+respectively. Finally, we optimized for alphabetical title order, {\em
+  a-z}, by starting the title with a space character.
+
+The best-case posting was also labeled with the keyword ``survey",
+which we knew from pilot studies was frequently used by turkers to
+find desirable survey HITs.  The other three postings had the same
+title and description as the best-case posting, but no ``survey"
+keyword.
+
+%\begin{figure*}[htp]
+%\centering
+%\includegraphics[scale=.6]{"./images/survey"}
+%\caption{Survey about sorting and filtering on MTurk}
+%\label{fig:X1}
+%\end{figure*}
+
+{\bf Worst-case posting.} To test the impact of especially poor
+position on a HIT's reachability, we also posted the survey in a way
+that was {\em hard to find} as possible for workers using any sorting
+category.  This was done by choosing parameter values near the median
+value of existing HITs on MTurk, so that the survey HIT would appear
+in the middle of the pack, as far as possible from the first page in
+both ascending and descending order by that attribute.
+
+For example, at the time the survey was posted, the median number of
+HITs available was two.  Postings with two HITs covered pages 55--65
+(out of 100 pages of HITs requiring no qualifications) when the list
+was sorted by {\em fewest} HITs available, and pages 35--45 when
+sorted by {\em most} HITs.  As a result, a worker sorting in either
+direction would have to click through at least 35 pages to reach any
+2-HIT posting, which is highly unlikely.  We therefore posted the
+survey with two independent HITs.
+
+For the remaining attributes, we chose a reward amount of \$0.05 and
+an expiration period of one week and allotted 60 minutes in order to
+position the HIT at least 20 pages deep among search results sorted by
+reward amount, creation date, and time allotted, in both ascending and
+descending order.  The median title of all current HITs started with
+``Q,'', so we started the survey title with the word ``Question" to
+make it hard to find whether sorting by {\em a-z} or {\em z-a}.
+
+Creation date, however, cannot be chosen directly.  In particular, a
+HIT cannot be posted with a creation date in the past.  Freshly posted
+HITs generally appear on the first page of the {\em newest} sort.  In
+order to artificially age our survey HIT before making it available to
+workers, we initially posted a nonfunctional HIT, which presented a
+blank page when workers previewed it or tried to accept it.  After six
+hours, when the HIT had fallen more than 30 pages deep in the {\em
+  newest} sort order, the blank page was replaced by the actual
+survey, and workers who discovered it from that point on were able to
+complete it.
+
+{\bf Newest-favored and a-z-favored posting.} We performed two
+additional postings of the survey, which were intended to favor users
+of one sort order while discouraging other sort orders.  The {\em
+  newest-favored} posting was like the worst-case posting in all
+parameters except creation date.  It appeared functional immediately,
+so users of the {\em newest} sort order would be most likely to find
+it.  Similarly, the {\em a-z-favored} posting used worst-case choices
+for all its parameters except its title, which started with a space
+character so that it would appear first in {\em a-z} order.
+
+All four postings were started on a weekday in May 2010, with their
+creation times staggered by 2 hours to reduce conflict between them.
+The best-case posting expired in 5 hours, while the other three
+postings continued to recruit workers for 7 days.
+
+\subsection{Results}
+Altogether, the four postings recruited 257 unique workers to the
+survey: 70 by the best-case posting (in only 5 hours), 58 by the
+worst-case posting, 59 by newest-favored, and 70 by a-z-favored (all
+over 7 days).  Roughly 50 workers answered more than one survey
+posting, detected by comparing MTurk worker IDs. Only the first answer
+was kept for each worker.
+
+Figure \ref{fig:X2} shows the rate at which each posting recruited
+workers to the survey over the initial 24-hour period.  The best-case
+posting shows the highest response rate, as expected, and the
+worst-case posting has the lowest.  The newest-favored posting shows a
+pronounced knee, slowing down after roughly 1 hour, which we believe
+is due to being pushed off the early pages of the {\em newest} sort
+order by other HITs.  Because the posting's parameters make it very
+hard to find by other sort orders, it subsequently grows similarly to
+worst-case.  The a-z-favored posting, by contrast, recruits workers
+steadily, because it remains on the first page of the a-z sort order
+throughout its lifetime.  These results show that HIT parameters that
+affect sorting and filtering have a strong impact on the response rate
+to a HIT.  All four postings were
+identical tasks with identical descriptions posted very close in time, and the best-case posting
+actually offered the lowest reward (\$0.01 compared to \$0.05 for the
+others), but its favorable sort position recruited workers roughly 30
+times faster than the worst-case posting.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=.35]{"./images/rcm_timing"}
+\caption{Number of workers responding to each survey posting within the first 24 hours of posting (time measured in days)}
+\label{fig:X2}
+\end{figure}
+
+Figure \ref{fig:X3} shows the responses to the survey question about
+sorting category, grouped by the posting that elicited the response.
+The best-case posting recruited most of its workers from the {\em
+  newest} sort order, reinforcing the importance of this sort order
+for 1-HIT wonders like a survey.  The {\em newest} sorting category
+also dominated the responses to the newest-favored posting, as
+expected, and {\em a-z} appeared stongest in the a-z-favored posting.
+Strong appearance of {\em most} HITs was a surprise, however, since
+each posting had only 1 or 2 HITs.
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=.35]{"./images/rcm_combined"}
+\caption{Number of workers who reported using each sort order to find
+  each of the four postings.}
+\label{fig:X3}
+\end{figure}
+
+%%%% DELETE THIS SECTION IF YOU NEED SPACE
+%\begin{comment}
+For the survey question about reward amount filtering, roughly 65\% of
+the survey respondents reported that they had not set any minimum
+amount when they found the survey HIT.  Surprisingly, however, 9\%
+reported that they had used a reward filter that was {\em greater}
+than the reward offered by the survey HIT.  For example, even though
+the best-case posting offered only \$0.01, ten respondents reported
+that they found the survey while searching for HITs that paid \$0.05
+or more.  We followed up by sending email (through MTurk) to several
+of these workers, and found that the problem can be traced to a
+usability bug in MTurk: {\em ``Once we submit a hit MTurk takes us
+  back to all hits available, 1st page with no \$ criteria."}  In
+other words, a filter is discarded as soon as the worker performs a
+single task.  Several other workers mentioned similar problems in
+their free-form comments.
+
+Similarly, roughly 20\% of the workers reported using a keyword filter
+when they found the survey, but half of these reported using keywords
+that were not actually included in the survey HIT, suggesting that the
+filter they thought they were using was no longer in effect.  21
+workers reported using the "survey" keyword, of whom 16 were
+responding to the best-case posting, which actually did include that
+keyword.
+%%%% END OF DELETABLE PART
+%\end{comment}
+
+Figure \ref{fig:X4} shows the distribution of result page numbers on which workers reported finding the survey HIT.  Roughly half found it on the first or second page of results, as might be expected.  Yet a substantial fraction (25\%) reported finding the survey beyond page 10.  Because of the
+way the survey was posted, particularly the worst-case posting, workers would not have been likely to find it anywhere else.  Yet it is still surprising that
+some workers are willing to drill dozens of pages deep in order to find tasks.
+
+The free-form comment question generated a variety of feedback and ideas.  Many respondents reported that they would like to be able to search for or filter out postings from particular requesters.  Other suggestions included the ability to group HITs by type, and to offer worker-provided ratings of HITs or requesters.  Several workers specifically mentioned the burden of clicking through multiple pages to find good HITs:
+
+{\em ``Scrolling through all 8 pages to find HITs can be a little tiring."}
+
+{\em ``I find it easier to find hits on mechanical turk if I search for the newest tasks created first. If I don't find anything up until page 10 then I refresh the page and start over otherwise it becomes too hard to find tasks."}
+
+Several workers pointed out a usability bug in MTurk that makes this problem even worse:
+
+{\em ``It is difficult to move through the pages to find a good HIT because as soon as you finish a HIT, it automatically sends you back to page 1. If you are on page 25, it takes so much time to get back to page 25 (and past there)."}
+
+{\em ``Please keep an option to jump to a page directly without opening previous pages.'' }
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=.35]{"./images/rcm_pages"}
+\caption{Histogram of result page numbers on which workers found
+the survey HIT.  Most found it on page 1, but many were willing to drill 
+beyond page 10.
+}
+\label{fig:X4}
+\end{figure}
+
+\section{Conclusion}
+In this paper, we studied the search behavior of MTurk workers
+using two different methods.  In our first method, we scraped pages of available tasks at a very high rate and used the HIT disappearance rates
+to see if certain sorting methods resulted in greater task acceptance.  
+
+Because this method does not accurately measure all types of HITs, we
+also posted a survey on MTurk asking workers how they search
+for our survey task.  We posted the task with specially chosen posting
+parameters complementary to those of the HITs we gathered
+information on using the scraper.
+
+Both methods show that workers tend to sort by {\em newest} HITs.  The
+scraping revealed that workers also sort by {\em most} HITs and focus
+mainly on the first two pages of search results but ignore the
+positions of the HITs on the page.  The survey data confirms that even
+though {\em newest} and {\em most} are the most popular search
+strategies, the other sort categories are also used---even relatively
+obscure ones such as {\em title a-z} and {\em oldest} HITs, but to a
+much lesser extent. The survey confirms that the first two pages of
+the search results are most important, but also shows evidence that
+some workers are willing to wade fairly deep into search results pages
+and to periodically return to the {\em newest} HITs results.
+
+\section{Future Work}
+Method A does not account for keyword searching or sorting by required
+qualifications. The Method A empirical results provide insight into
+how workers search, but it would useful to develop a structural model
+of search behavior that incorporated the quantity of work being done
+could make predictions.
+
+\section{Acknowledgments} 
+John thanks the NSF-IGERT Multidisciplinary Program in Inequality \&
+Social Policy for generous financial support (Grant
+No. 0333403). Thanks to Marc Grimson for help running the
+survey and to Greg Little and Jaime Teevan for feedback. Thanks to Robin Y. Horton, Carolyn Yerkes and three anonymous
+reviewers for very helpful comments. All plots were made using
+\texttt{ggplot2} \cite{wickham2008ggplot2} and all multilevel models
+were fit using \texttt{lme4}\cite{bates2008lme4}.
+
+\bibliographystyle{abbrv}
+\bibliography{search.bib}
+
+\end{document} 
+
+\section{Method B: Worker Survey -from first submitted version}
+Another way to study how workers search for HITs is to ask the workers
+directly, by conducting a survey on MTurk. Although this approach is more
+expensive, more obtrusive, and smaller-scale than scraping the MTurk
+web site, it has two advantages.  First, surveying complements the
+scraping technique.  Scraping is better suited to tracking postings of
+large numbers of type (1) HITs whose tasks can be performed multiple times by any worker,
+so an anonymous scraper can observe their acceptance.  Surveys, by
+contrast, are necessarily 1-HIT Wonders, offered at most once to every
+worker, and MTurk offers no way for a scraper to observe how many
+workers have accepted the offer.  Since a substantial use of MTurk
+involves 1-HIT Wonders for online experimentation and surveys of other
+kinds, we need a method for exploring search behavior on this side of
+the market.  Second, surveys can provide more detailed and subjective
+explanations for worker behavior than aggregate statistics.
+
+This section presents the results of a survey of roughly 200 workers
+about how they sort and filter HITs. Since MTurk was used to
+conduct the survey, the characteristics of the HIT used to solicit
+survey respondents have an effect on the results.  We explored this
+effect by posting the survey in several different ways in order to
+sample workers who exhibited different search behaviors.  In the process,
+we observed how certain choices of HIT characteristics can make a HIT
+very hard to find, substantially reducing the response rate.  Finally,
+the survey also collected free-form comments from workers about how
+they find good and bad HITs.
+
+\subsection{Procedure}
+The survey was designed to probe respondents' immediate search
+behavior---specifically, how respondents used MTurk's search
+interface to discover the survey HIT itself. As discussed in
+Section \ref{sec:features}, MTurk offers two ways to control the
+display of HITs: by sorting and filtering.  In the first survey question, for the sake of consistency and familiarity, workers were asked which of the 12 possible sorting categories in MTurk's drop-down menu they were presently using.  In the second question, workers were asked whether they were presently using a reward amount filter.  Although MTurk offers three ways to filter (reward amount,
+keywords, and qualifications), the survey only asked about reward amount
+because the survey HIT required no qualifications and presumed that
+the user wouldn't be looking for it directly using a keyword.  The
+third question asked the worker for free-form comments.
+
+The survey was posted on MTurk in three ways, using
+different HIT characteristics for each posting to give it high and low positions in the various sorted search results.  All
+postings were made over a single 48-hour period on a weekend in early
+May 2010.  Each of the three postings was kept on MTurk until it elicited 100 responses, but no longer than five hours.
+
+\subsubsection{Best-case posting}
+In the first survey post, the parameters of the HIT were chosen to place it among the top search results under each of the six primary sort categories.  Thus
+the HIT would appear on the first page, or as close as possible, when
+HITs were sorted by {\em any} attribute in either ascending or
+descending order.  The goal of this posting was to capture as many
+workers as possible from each of the six chosen sort orders that the
+posting optimized.
+
+The HIT was automatically one of the {\em
+  newest}, at first, and had the
+{\em fewest} possible HITs available because it offered was only offered once to each user.  For a
+reward, we chose the {\em lowest} amount: \$0.01.  In fact, some HITs are posted for \$0.00, but workers are
+likely to be sufficiently aware to skip over work-for-nothing
+tasks.  For the {\em soonest} expiration date and the {\em shortest}
+time allotted, we chose 5 hours and 5 minutes, respectively.  Again,
+existing HITs had shorter deadlines, but our choices were constrained
+by the requirements of the survey itself and were in any event sufficient to
+position the HIT on the first pages of those two sorted search results.  Finally, we
+optimized for alphabetical title order, {\em a-z}, by starting the title with a
+space character.
+
+%\begin{figure*}[htp]
+%\centering
+%\includegraphics[scale=.6]{"./images/survey"}
+%\caption{Survey about sorting and filtering on MTurk}
+%\label{fig:X1}
+%\end{figure*}
+
+\subsubsection{Newest-only posting}
+In the second survey post, the HIT was designed to appear only at the start of
+{\em newest}, which we hypothesized was the most important sorting category
+for 1-HIT Wonders.  To see if we could isolate the workers using this
+category, we chose the remaining attributes to make the HIT as {\em
+  hard to find} as possible for workers using other sorting categories.  This
+was done by selecting parameter values near the median value of
+existing HITs on MTurk, so that the survey HIT would appear in the
+middle of the pack, as far as possible from the first page
+in both ascending and descending order by that attribute.
+
+For example, at the time the survey was posted, the median number of
+HITs available was two.  Postings with two HITs covered pages 55--65 (out
+of 100 pages of HITs requiring no qualifications) when the list was
+sorted by {\em fewest} HITs available, and pages 35--45 when sorted by
+{\em most} HITs.  As a result, a worker sorting in either direction
+would have to click through at least 35 pages to reach any 2-HIT
+posting, which is highly unlikely.
+
+We therefore posted the survey with two independent HITs.  In doing so, we could not be guaranteed that a worker would only answer it once.
+In order to avoid this problem, we placed a cookie on a worker's browser
+after survey submission, but some workers evaded this, and their
+redundant answers were discarded post hoc by searching for duplicate
+MTurk worker IDs in the submitted surveys.
+
+For the remaining attributes, we chose a reward amount of \$0.05 and
+an expiration period of one week and allotted 60 minutes in order to position the HIT at least 20 pages deep among search results sorted by reward amount, creation date, and time allotted, in both
+ascending and descending order.  The median title of all current HITs started with ``U,'', so
+we prefixed the survey title with the word ``Urgent" to make it hard to find whether sorting by {\em a-z} or {\em z-a}.
+
+\subsubsection{Worst-case  posting}
+Finally, to test the impact of especially poor position on a HIT's
+reachability, we also posted the survey in such a way that positioned it on a deep page
+for {\em all} sorting categories.  For the five attributes other than
+creation date, the HIT parameters were the same as those described for
+newest-only posting.
+
+Creation date, however, cannot be chosen directly.  In particular, a HIT
+cannot be posted with a creation date in the past.  Freshly posted
+HITs generally appear on the first page of the {\em newest} sort.  In
+order to artificially age our survey HIT before making it available to
+workers, we initially posted a nonfunctional HIT, which presented a
+blank page when workers previewed it or tried to accept it.  After two
+hours, when the HIT had fallen more than 5 pages deep in the {\em
+  newest} sort order, the blank page was replaced by the actual
+survey, and workers who discovered it from that point on were able to
+complete it.
+
+\subsection{Results}
+Altogether, the three postings recruited 234 unique workers to the
+survey: 100 by the best-case posting, 86 by the newest-only posting
+(14 were removed as duplicate submissions by the same worker), and 38
+by the worst-case posting.  Only the worst-case posting was unable to
+collect 100 answers to the survey in five hours.
+
+Figure \ref{fig:X2} shows the rate at which each posting recruited workers to
+the survey.  The best-case and newest-only postings generated similar
+curves, which suggest an initially steep response rate (while the
+posting was on the first page of the {\em newest} sorted search results), followed
+by a slower up-take as the posting fell onto deeper pages.  The
+worst-case posting, by contrast, had a steady but low response rate,
+recruiting only eight workers per hour on average, compared to 25 workers
+per hour for the other two postings, almost certainly because it
+started out deep in the page list for all sorted search results.
+
+Figure \ref{fig:X3} shows the responses to the first survey question about sorting category, grouped by the posting that solicited the response.
+The newest-only posting successfully
+recruited workers who, in fact, sorted by {\em newest}: over 80\% of the respondents to that post reported that search by creation date.  The {\em newest} sorting category also
+dominated the responses to the best-case and worst-case survey postings, followed by {\em most} HITs.  Strong
+appearance of {\em most} HITs was a surprise.  Recall that the
+best-case posting was designed to attract workers who sorted not only by {\em
+  newest}, but also by {\em fewest} HITs, {\em lowest} price, {\em a-z},
+{\em soonest} expiration, and {\em shortest} time allotted.  All these
+sorting categories appeared in the responses, but {\em fewest} was still
+strongly dominated by {\em most}.
+
+For the second survey question about reward amount filtering, roughly 80\% of the survey respondents
+reported that they had not set any minimum amount when they found the survey HIT.
+Surprisingly, however, 8\% reported that they had used a reward filter that was {\em
+  greater} than the reward offered by the survey HIT.  For example,
+even though the best-case posting offered only \$0.01, 10 respondents
+reported that they found the survey while searching for HITs that paid at least
+\$0.05.  We followed up by sending email (through MTurk) to several of
+these workers, and found that the problem can be traced to a usability
+bug in MTurk:
+
+{\em ``Once we submit a hit MTurk takes us back to all hits available,
+1st page with no \$ criteria."
+}
+
+In other words, a filter is discarded as soon as the worker performs a single task.  Several other workers mentioned similar problems in their free-form comments.
+
+The free-form comment question generated a variety of feedback and ideas.  A commonly-cited concern was ``scams," by which workers typically meant a profusion of high-reward tasks that ask workers to sign up for paid services or provide personal information that might be abused.  Twelve respondents reported that they would like to be able to search for or filter out postings from particular requesters, for example:
+
+{\em ``Pages and pages and pages from the same requester that I know I won't choose are annoying because I have to scroll through those pages to get to new hit I'd like to do.  I'd like a way to exclude these requesters when searching for a hit."
+}
+
+Other suggestions included the ability to group HITs by type, and to offer worker-provided ratings of HITs or requesters.
+
+Several workers mentioned using keyword search to find desirable HITs, particularly keywords like ``fun," ``quick," and ``survey." In fact, the use of the term ``survey" in the HIT title may have boosted the response rate, particularly for the worst-case posting, which is hard to find any other way. However:
+
+{\em ``It would be a great search system, but a lot of tasks are bloated with non-applicable search terms (such as tagging it with `survey' when it has nothing to do with it."
+}
+
+Several workers specifically mentioned the burden of clicking through multiple pages to find good HITs:
+
+{\em ``Scrolling through all 8 pages to find HITs can be a little tiring."}
+
+{\em ``I find it easier to find hits on mechanical turk if I search for the newest tasks created first.If I don't find anything up until page 10 then I refresh the page and start over otherwise it becomes too hard to find tasks."}
+
+Two workers pointed out the usability bug in MTurk that makes this problem even worse:
+
+{\em ``It is difficult to move through the pages to find a good HIT because as soon as you finish a HIT, it automatically sends you back to page 1. If you are on page 25, it takes so much time to get back to page 25 (and past there)."}
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=.5]{"./images/rcm_combined"}
+\caption{Number of workers who reported using each sort order to find
+  each of the three postings.}
+\label{fig:X3}
+\end{figure}
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[scale=.5]{"./images/rcm_timing"}
+\caption{Number of workers taking the survey over time.}
+\label{fig:X2}
+\end{figure}
+
+%
+%\begin{figure}[htp]
+%\centering
+%\includegraphics[scale=.4]{"./images/allthree"}
+%\caption{Number of workers recruited over time by each of the three postings.}
+%\label{fig:X2}
+%\end{figure}
+
+%\begin{figure}[htp]
+%\centering
+%\includegraphics[scale=.4]{"./images/bestnewestworst"}
+%%actually this needs to be one image with all three graphs
+%\caption{
+%\end{figure}
+
+\subsection{Findings}
+
+The survey posting was designed to target search strategies that the scraped data may overlook, such as 1-HIT Wonders and HITs buried deep in search results.  In both the survey results and the scraped data results, we found
+workers searching by {\em newest} HITs.  However, although our two
+methods are complementary, we did not necessarily expect to see
+similarities.  For example, we observed workers
+searching by {\em most} HITs in the scraped data, but not in the survey.  This is because it would be nearly
+impossible to find the survey while searching by {\em most} HITs.  In the scraped data we found evidence of workers sorting by {\em newest} HITs and by {\em most} HITs.  However, in the survey
+results, workers reported using 10 of the 12 sorting
+categories.  With a larger survey sample, it is possible that we could
+find evidence of workers sorting by all the 12 categories.
+
+Surprisingly, we see that workers look fairly deeply into search results
+pages.  This is evidenced by both the free-text responses and responses to the survey HITs that were deliberately placed over five pages deep in the {\em newest} search results.  From the scraped data, we conclude
+that it is not common for workers to look past the third page of search results, but the
+survey responses show that it nevertheless happens on occasion.
+
+In the survey, workers mentioned that in the process of searching for {\em newest}
+HITs, they would wait some length of time and then revisit the first page
+of {\em newest} search results.  This seems to be an effective tactic and bears
+much similarity to how users browsing the web will revisit sites
+looking for new and updated content.  Tools have been developed to
+aid the recognition of updated web content \cite{teevan2009changing,
+  adar2008zoetrope}; perhaps similar tools for task search would be
+valuable.
+
+\section{John's old section}
+\subsection{Empirical Framework} 
+We collect data on a number of HIT characteristics that surely affect
+how desirable workers find those HITs. Everything else being equal,
+workers presumably prefer HITs that pay more, take less time, are
+interesting etc. However, it would be a mistake to regress some measure
+of desirability---such as task uptake---on HIT characteristics 
+and then give the resultant model a causal interpretation. 
+
+The problem is that HIT traits are not randomly determined and
+independent; they are highly correlated with factors that we are
+unable to observe and yet we can be certain affect uptake. For
+example, HITs paying more money are more attractive all else equal,
+but HITs pay more money precisely when the work is more onerous and
+time-consuming.  
+
+Because we do not observe task difficulty, the requester's reputation,
+and the skills required to complete a HIT, the so-called ``omitted
+variable'' problem will be hard to overcome using purely observational
+data like the data obtained from scraping.\footnote{Econometric
+  difficulties aside, the best way to determine the valuation workers
+  put on different job attributes is to conduct randomized experiments
+  where the experimenter manipulates HIT characteristics and then
+  observes the differences in views and uptakes.} However, it is still
+possible to learn a great deal from the data by choosing a model that
+can deal with nature of the data.
+
+Although we are limited by the face that unobserved (to us)
+characteristics affect output, one major advantage of our data is that
+by using the high-frequency scraper, we obtain multiple (in some
+cases, thousands) of observations on a single HIT group. If we believe
+that the idiosyncratic factors specific to a HIT group are unchanging,
+then our repeated measurement allow us to estimate the effects of HIT
+group factors that \emph{do} change over time.
+
+Fortunately, those factors that do change over time are the ones of
+greater interest. The question we cannot readily answer---how
+idiosyncratic HIT features affect uptake---is less interesting than
+the question that we can answer, which is how the search technology
+and procedures itself---manifested in the page and position of a HIT,
+over time, in different ``views''---affects uptake. Before we discuss
+our method in detail, it is necessary to provide some background on
+dealing with data structured like ours and how to interpret the models
+appropriate for such data.
+
+\subsection{Multilevel Models} 
+The data collected from the scraper has a strongly grouped structure,
+with observations that are clearly not independent draws. Until a HIT
+moves off one of the scraped pages, each HIT collection is observed by
+the scraper approximately every 30 seconds. HIT collections are thus
+generally observed many times. Each observation in the group shares
+certain time-invariant characteristics, such as the identity of the
+requester, the title, the description and the reward. However, other
+factors, like the number of HITs available or the page and the
+position change over time.
+
+\subsection{Defining Variables} 
+Our outcome of interest is rate at which work is completed. One way to
+measure this outcome is to look how the number of HITs available
+within a particular group changes over time.  Let $s$ index the search
+view, $g$ index the groups of observations of the same HIT and let $i$
+index time-ordered observations within a group. Let HITs be ordered
+from oldest to most recently scraped, such that $i+1$ was scraped
+after $i$. Let number of HITs available for observation $i$ be
+$y_{igs}$.  The change is simply $\Delta y_{igs} = y_{(i+1)gs}$
+. Unfortunately, there are several problems with using this outcome
+measure directly as a measure of uptake.
+
+First, requesters can add and subtract HITs over time. If a requester
+pulls down a large number of HITs, then a regression might incorrectly
+lead us to believe that there was something very attractive about the
+page position of that HIT to workers.  Second, when a requester wants
+each HIT done multiple times by different workers, the HITs available
+measure might not change, even though the HIT might be very
+popular. Third, is decremented when a worker accepts a HIT; if that
+worker then returns at HIT before completing it, then our outcome is
+in some sense a horse-race between HITs being accepted and HITs being
+returned. Finally, the the absolute change is ``censored'' in that the
+number of HITs available cannot go below zero, which means that groups
+with lots of HITs available can have mechanically have larger changes
+than groups with few HITs available.
+      
+These problems further highlight the need to use group-specific
+effects. They are also justification for making our outcome variable
+an indicator for a drop in HITs available: 
+\[Y_{igs} = 1\cdot \{\Delta y_{ijs} < 0\} \]
+
+The outcome now interpretable as more HITs were accepted than were
+returned between the scraping interval. Part of the effect of
+requesters adding/subtracting HITs will be captured by the
+group-effect, while the rest will at least be ``contained'' in the
+sense that even if a requester added thousands of HITs, this action
+would not swamp the effect of legitimate changes in HITs available due
+to acceptance.
+
+To create the , we ordered all the HITs within a group by scrape time,
+and then computed the elapsed time between successive observations for
+that group (30 seconds between observations) and computed the change
+in the number of HITs available.
+
+\subsection{The Model} 
+For an observation $i$ of group $g$, and for a give page $p$ and
+search view $s$, we estimate the multilevel model with fixed effects
+for a HIT's position on the page ($x^r_{ig}=1$ is the HIT $i$ is at
+position $r$, $x^r_{ig}=0$ otherwise) and random effects for the group, $\gamma_{ig}$ and
+for the scrape hour (0-24), $\tau_{H(i,j)}$:
+\begin{align} \label{eq:mlm}
+Y_{ig} = \sum_{r=1}^{10}\beta^r_s x^r_{ig} + \gamma_{g} + \tau_{H(i,g)} + \epsilon
+\end{align} 
+where $\gamma_g \sim N(0,\sigma^2)$ and $\tau_{H(i)} \sim N(0,\sigma)$. 
+
+When we include group-specific effects, the effects of position and
+page can only be identified via within-group changes in position and
+page: if a particular group always stayed at a position, then whatever
+effect on uptake was due solely to that position would be ``absorbed''
+by the group-specific effect.
+
+\subsection{Results} 
+The coefficients $\hat{\beta}^r_s$ from Equation \ref{eq:groups} is
+interpretable as the probability that a HIT group occupying position
+$r$ decremented by 1 or more HITs available during the scraping
+interval. The results of this regression, from pages $p=1\ldots3$ and
+for four difference search views are shown in in Figure \ref{fig:A}. 
+
+The red vertical line is the average value of the coefficient. The
+search categories are in columns, while the pages are in rows. The
+coefficients from the associated regression are plotted in each
+panel. Overall, with the exception of \verb|NumHITsAvailable|,
+there appear to be rather weak page and position effects.
+
+There is perhaps a slight advantage to being listed first
+alphabetically. Being in the position of having the most HITs
+available has a strong, positive effect.
+
+The \verb|Reward1| coefficients are precisely estimated
+zeros. The reason is that there is almost no variation in the outcome
+variable for these high-valued HIT groups. Only about 5 out of 10,000
+observations had any of these HITs being decremented. In a case like
+this, the random effects model is explaining whatever idiosyncratic
+variation exists. Essentially, there cannot be strong positional
+effects in ´Reward1¡on uptake because there is no uptake.
+
+The big surprise is the lack of position or page effects in the
+\verb|LastUpdatedTime1| column. Anecdotally, requesters and workers
+alike seem to believe that being a ``new'' HIT has an effect on
+uptake. That HITs in the first position of \verb|LastUpdatedTime1| are
+disappearing at the same rate as those in Title1 seems implausible. To
+help understand this puzzle, we will first look at the pooled,
+ordinary regression that excludes group effects. While these
+regressions cannot be interpreted causally, they coefficients do give
+the mean number of decrements in that position. 
+
+In Figure \ref{fig:B}, we report the coefficients of the pool
+regression. In the Last Updated Column, we can now see large effects
+associated with both page and rank within the page. On average, the
+first listed HIT on page 1 of the LastUpdatedTime1 was decremented
+about 30\% of the time, compared to about 10\% on page 3, position 10.
+
+\subsubsection{Reconciling the Anomoly}
+Either their truly are no positional effects or there is something
+wrong with the model and its assumptions. Given the survey evidence
+[xxx – introduced yet?], it seems unlikely that position does not
+matter in the LastUpdatedTime1 search view. One way that the model
+assumptions could be violated is a certain HIT collection spends more
+time in a certain position than random chance would permit. One way
+this could happen is if requesters are able to control their
+position. If, for example, a requester can move into position 1 often,
+and there are true advantages to being in position 1, then this purely
+positional advantage gets absorbed by the group specific effect. We
+wrongly conclude that a HIT is getting done a lot because of the
+nature of the HIT, when in fact the ``nature of the HIT'' is to often
+be near the top of the list.
+
+
+
+\subsection{Economics}
+There is a large and influential literature on job search in economics
+[Mortensen and Pissarides, 1999]. The basic question is how workers
+search for jobs that will be a good fit for their skills and offer
+more benefits than their next best alternative? Research on job
+selection is important to the design of unemployment insurance and
+other social policies, but unfortunately, traditional job search is
+difficult to study.  We observe people getting a job and leaving a
+job, but we don't get to see them actually searching or observe which
+jobs they considered and rejected (or jobs they were rejected for).
+MTurk provides a unique window into this process.  Although MTurk is
+very different from a traditional labor market, search strategies may
+bear similarities, especially with other online labor markets such as
+oDesk and Elance.  Furthermore, if our understanding of search
+behavior on MTurk leads us to having an impact on efficiency, fairness
+and social welfare of online labor markets, and it may help human
+computation and online labor markets gain mainstream acceptance.
