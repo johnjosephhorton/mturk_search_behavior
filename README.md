@@ -30,10 +30,21 @@ Chilton, Lydia B., et al. "Task search in a human computation market." Proceedin
 1. lme4
 1. texlive-full 
 
-## To Re-Create Analysis
+## To Re-Create Analysis (assuming dependencies met)
 ```
 git clone git@github.com:johnjosephhorton/mturk_search_behavior.git
 cd mturk_search_behavior
 cd writeup
 make mturk_search_behavior.pdf 
 ```
+
+## To run as a Docker container 
+```
+git clone git@github.com:johnjosephhorton/mturk_search_behavior.git
+sudo docker build -t mturk_search_behavior mturk_search_behavior 
+```
+To log in and explore, 
+```
+sudo docker run -it mturk_search_behavior mturk_search_behavior 
+```
+
